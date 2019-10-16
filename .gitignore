@@ -1,0 +1,4 @@
+# ignore the data
+*.zip
+*.pdf
+aclimdb/
