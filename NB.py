@@ -21,18 +21,14 @@ Report the accuracy of your program on the test data with BOW features.
 
 
 def get_filepaths():
-    train_fp = input('Please input the name of the training file: ')
-    test_fp = input('Please input the name of the test file: ')
-    return train_fp, test_fp
+    train_file = input('Please input the name of the training file: ')
+    test_file = input('Please input the name of the test file: ')
+    return train_file, test_file
 
 
-def create_dict(filepath='imdb.vocab'):
-    vocab_dict = {}
-    with open(filepath) as vocab:
-        for word in vocab:
-            vocab_dict[word] = 0
-    return vocab_dict
-
-
-def train_NB(data_dir):
+def train_NB(train_file, test_file, params_file='movie-review-BOW.NB', pred_file='BOW-predictions.NB'):
     pass
+
+
+train_file, test_file = get_filepaths()
+train_NB = train_NB(train_file, test_file, params_file='small-BOW.NB', pred_file='small-predictions.NB')
