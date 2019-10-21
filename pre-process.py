@@ -58,11 +58,9 @@ def create_vector_file(input_dir='aclImdb/',
                        cat1='neg', cat2='pos',
                        train=True):
     vocab_dict = create_dict(filepath=input_dir+'imdb.vocab')
-    # print(vocab_dict)
     len_dict = len(vocab_dict)
 
     vector_file = open(filename, 'w+')
-    # vectors = None
 
     if train:
         fp = 'train/'
@@ -73,30 +71,14 @@ def create_vector_file(input_dir='aclImdb/',
     with os.scandir(cat1_path) as cat1_dir:
         for file in cat1_dir:
             vector = update_vector(0, file, vocab_dict, len_dict)
-            # print('vector', vector)
-            # print('vectors', vectors)
-            vector_file.write(' '.join(vector) + '\n')
-            # np.savetxt(filename, vector, delimiter=',', fmt='%d')
-            # if vectors is not None:
-            #     vectors = np.vstack((vectors, vector))
-            # else:
-            #     vectors = vector
+            vector_file.write(' '.join(vector) + '\n') # need to check if this shows in NB.py
 
     cat2_path = input_dir + fp + cat2 + '/'
     with os.scandir(cat2_path) as cat2_dir:
         for file in cat2_dir:
             vector = update_vector(1, file, vocab_dict, len_dict)
-            # print('vector', vector)
-            # print('vectors', vectors)
             vector_file.write(' '.join(vector) + '\n')
-            # np.savetxt(filename, vector, delimiter=',', fmt='%d')
-            # if vectors is not None:
-            #     vectors = np.vstack((vectors, vector))
-            # else:
-            #     vectors = vector
     
-    # print(vectors)
-
     vector_file.close()
 
 

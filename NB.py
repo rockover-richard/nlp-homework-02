@@ -71,7 +71,9 @@ def build_params(train_file, params_file='movie-review-BOW'):
     return neg_counts_v, pos_counts_v, vocab_dict
 
 
+# incomplete
 def train_NB(train_file, test_file, params_file='movie-review-BOW.NB', pred_file='BOW-predictions.NB'):
+    vocab_dict = create_dict()
     neg_vector, pos_vector, vocab_dict = build_params(train_file, params_file)
 
     pred_output = open(pred_file, 'w+')
