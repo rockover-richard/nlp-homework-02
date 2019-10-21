@@ -36,8 +36,8 @@ def get_filepaths():
     return train_file, test_file
 
 
-def build_params(train_file, params_file='movie-review-BOW'):
-    vocab_dict = create_dict()
+def build_params(train_file, params_file='movie-review-BOW.NB'):
+    vocab_dict = create_dict('small/small.vocab')
     len_dict = len(vocab_dict)
 
     neg_count = 0
@@ -68,8 +68,10 @@ def build_params(train_file, params_file='movie-review-BOW'):
         params.write(' '.join(neg_counts_v.astype(str)) + '\n')
         params.write(' '.join(pos_counts_v.astype(str)))
 
-    return neg_counts_v, pos_counts_v, vocab_dict
+    return neg_counts_v, pos_counts_v
 
+with open('movie-review-small.NB') as mrs:
+    build_params(mrs, params_file='small-BOW.NB')
 
 # incomplete
 def train_NB(train_file, test_file, params_file='movie-review-BOW.NB', pred_file='BOW-predictions.NB'):
@@ -92,5 +94,5 @@ def train_NB(train_file, test_file, params_file='movie-review-BOW.NB', pred_file
     pass
 
 
-train_file, test_file = get_filepaths()
-train_NB = train_NB(train_file, test_file, params_file='small-BOW.NB', pred_file='small-predictions.NB')
+# train_file, test_file = get_filepaths()
+# train_NB = train_NB(train_file, test_file, params_file='small-BOW.NB', pred_file='small-predictions.NB')

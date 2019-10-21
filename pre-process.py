@@ -10,9 +10,7 @@ punctuation from words and lowercase the words in the reviews.
 import re
 import numpy as np
 import os
-# from zipfile import ZipFile
 
-test_file = 'aclImdb/testing.txt'
 
 def create_dict(filepath='imdb.vocab'):
     vocab_dict = {}
@@ -23,21 +21,36 @@ def create_dict(filepath='imdb.vocab'):
 
 
 def split_text(file):
+    emoticons = {':)', ':-)', ';)', ';-)', ');', '=)', '8)', '):', ':o)',
+                 ';o)', '=o)', ':(', '(8', ':-(', '(=', '8(', '=('}
+    sp_char = {':', ';', "'", '(', ')'}
+
     words = file.read()
-    temp_list = re.split(r"\s|[,.;<>\"]|'s|([!?])", words.lower())
+    temp_list = re.split(r"\s|[,.<>*\"]|'s|([!?])", words.lower())
     word_list = []
 
     for word in temp_list:
-        if not word or len(word) <= 1:
+        if not word:
             continue
-        if word[-1] == ':' or word[-1] == '(' or word[-1] == ')':
+        # to handle emoticons
+        if ')' in word or '(' in word:
+            for icon in emoticons:
+                if icon in word:
+                    word_list.append(icon)
+        # to handle leading special characters in words
+        # e.g. (hello -> hello
+        if word[-1] in sp_char and len(word) > 1:
             word = word[:-1]
-        if word[0] == "'" or word[0] == '(':
+        # to handle trailing special characters in words
+        # e.g. world: -> world
+        if word[0] in sp_char and len(word) > 1:
             word = word[1:]
         word_list.append(word)
 
-    # print(word_list)
     return word_list
+
+# with open('testing.txt') as test_file:
+#     print(split_text(test_file))
 
 
 def update_vector(cat, file, vocab_dict, len_dict):
@@ -57,7 +70,7 @@ def create_vector_file(input_dir='aclImdb/',
                        filename='vector-file.txt',
                        cat1='neg', cat2='pos',
                        train=True):
-    vocab_dict = create_dict(filepath=input_dir+'imdb.vocab')
+    vocab_dict = create_dict(filepath=input_dir+'small.vocab')
     len_dict = len(vocab_dict)
 
     vector_file = open(filename, 'w+')
@@ -78,12 +91,12 @@ def create_vector_file(input_dir='aclImdb/',
         for file in cat2_dir:
             vector = update_vector(1, file, vocab_dict, len_dict)
             vector_file.write(' '.join(vector) + '\n')
-    
+
     vector_file.close()
 
 
-# create_vector_file(input_dir='small/', filename='movie-review-small.NB', cat1='action', cat2='comedy')
-# create_vector_file(input_dir='small/', filename='movie-review-small-test.NB', cat1='action', cat2='comedy', train=False)
+create_vector_file(input_dir='small/', filename='movie-review-small.NB', cat1='action', cat2='comedy')
+create_vector_file(input_dir='small/', filename='movie-review-small-test.NB', cat1='action', cat2='comedy', train=False)
 
-create_vector_file(filename='vector-file-train.NB')
-create_vector_file(filename='vector-file-test.NB', train=False)
+# create_vector_file(filename='vector-file-train.NB')
+# create_vector_file(filename='vector-file-test.NB', train=False)
