@@ -18,6 +18,16 @@ Train NB classifier on the training partition using BOW features
 Save parameters of your BOW model in a file called movie-review-BOW.NB.
 Report the accuracy of your program on the test data with BOW features.
 '''
+import numpy as np
+import math
+
+
+def create_dict(filepath='aclImdb/imdb.vocab'):
+    vocab_dict = {}
+    with open(filepath) as vocab:
+        for ind, word in enumerate(vocab, 1):
+            vocab_dict[word.rstrip()] = ind
+    return vocab_dict
 
 
 def get_filepaths():
@@ -26,7 +36,57 @@ def get_filepaths():
     return train_file, test_file
 
 
+def build_params(train_file, params_file='movie-review-BOW'):
+    vocab_dict = create_dict()
+    len_dict = len(vocab_dict)
+
+    neg_count = 0
+    neg_counts_v = np.zeros(len_dict+1)
+    pos_counts_v = np.zeros(len_dict+1)
+
+    for line in train_file:
+        vector = np.fromstring(line, dtype=float, sep=' ')
+        if vector[0] == 0:
+            neg_count += 1
+            neg_counts_v += vector
+        else:
+            pos_counts_v += vector
+
+    pos_count = pos_counts_v[0]
+    total_neg = sum(neg_counts_v[1:])
+    total_pos = sum(pos_counts_v[1:])
+
+    # the first entry will be the prior probabilities
+    neg_counts_v[0] = (neg_count)/(neg_count+pos_count)
+    pos_counts_v[0] = (pos_count)/(neg_count+pos_count)
+
+    for i in range(1, len(neg_counts_v)):
+        neg_counts_v[i] = (neg_counts_v[i]+1)/(total_neg+len_dict)
+        pos_counts_v[i] = (pos_counts_v[i]+1)/(total_pos+len_dict)
+
+    with open(params_file, 'w+') as params:
+        params.write(' '.join(neg_counts_v.astype(str)) + '\n')
+        params.write(' '.join(pos_counts_v.astype(str)))
+
+    return neg_counts_v, pos_counts_v, vocab_dict
+
+
 def train_NB(train_file, test_file, params_file='movie-review-BOW.NB', pred_file='BOW-predictions.NB'):
+    neg_vector, pos_vector, vocab_dict = build_params(train_file, params_file)
+
+    pred_output = open(pred_file, 'w+')
+
+    with open(test_file, 'r') as tf:
+        for line in tf:
+            neg_prob = neg_vector[0]
+            pos_prob = pos_vector[0]
+            vector = np.fromstring(line, sep=' ')
+            nz_ind = np.nonzero(vector)
+            for ind in nz_ind[1:]:
+                neg_prob *= neg_vector[ind] ** vector[ind]
+                pos_prob *= pos_vector[ind] ** vector[ind]
+            pred_output
+
     pass
 
 
