@@ -37,7 +37,7 @@ def get_filepaths():
 
 
 def build_params(train_file, params_file='movie-review-BOW.NB'):
-    vocab_dict = create_dict('small/small.vocab')
+    vocab_dict = create_dict()
     len_dict = len(vocab_dict)
 
     neg_count = 0
@@ -56,9 +56,13 @@ def build_params(train_file, params_file='movie-review-BOW.NB'):
     total_neg = sum(neg_counts_v[1:])
     total_pos = sum(pos_counts_v[1:])
 
-    # the first entry will be the prior probabilities
-    neg_counts_v[0] = (neg_count)/(neg_count+pos_count)
-    pos_counts_v[0] = (pos_count)/(neg_count+pos_count)
+    # the first entry will be the labels
+    neg_counts_v = np.insert(neg_counts_v, 0, 0)
+    pos_counts_v = np.insert(pos_counts_v, 0, 1)
+
+    # the second entry will the prior probabilities
+    neg_counts_v[1] = (neg_count)/(neg_count+pos_count)
+    pos_counts_v[1] = (pos_count)/(neg_count+pos_count)
 
     for i in range(1, len(neg_counts_v)):
         neg_counts_v[i] = (neg_counts_v[i]+1)/(total_neg+len_dict)
@@ -70,13 +74,16 @@ def build_params(train_file, params_file='movie-review-BOW.NB'):
 
     return neg_counts_v, pos_counts_v
 
-with open('movie-review-small.NB') as mrs:
-    build_params(mrs, params_file='small-BOW.NB')
 
 # incomplete
-def train_NB(train_file, test_file, params_file='movie-review-BOW.NB', pred_file='BOW-predictions.NB'):
-    vocab_dict = create_dict()
-    neg_vector, pos_vector, vocab_dict = build_params(train_file, params_file)
+def train_NB(train_file, test_file,
+             params_file='movie-review-BOW.NB',
+             pred_file='BOW-predictions.NB'):
+
+    with open(params_file, 'r') as pf:
+        params = pf.readlines()
+        neg_vector = params[0]
+        pos_vector = params[1]
 
     pred_output = open(pred_file, 'w+')
 
@@ -89,10 +96,17 @@ def train_NB(train_file, test_file, params_file='movie-review-BOW.NB', pred_file
             for ind in nz_ind[1:]:
                 neg_prob *= neg_vector[ind] ** vector[ind]
                 pos_prob *= pos_vector[ind] ** vector[ind]
-            pred_output
+            if neg_prob > pos_prob:
+                pred_output.write('neg', neg_prob, 0 if neg_prob)
+            else:
+                pred_output.write('pos', )
+    pred_output.close()
 
     pass
 
+
+with open('movie-review-small.NB') as mrs:
+    build_params(mrs, params_file='small-BOW.NB')
 
 # train_file, test_file = get_filepaths()
 # train_NB = train_NB(train_file, test_file, params_file='small-BOW.NB', pred_file='small-predictions.NB')
