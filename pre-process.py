@@ -17,8 +17,6 @@ def create_dict(filepath='aclImdb/imdb.vocab'):
     with open(filepath) as vocab:
         for ind, word in enumerate(vocab, 1):
             vocab_dict[word.rstrip()] = ind
-            print(ind, word)
-    print('success!')
     return vocab_dict
 
 create_dict()
@@ -73,7 +71,7 @@ def create_vector_file(input_dir='aclImdb/',
                        filename='vector-file.txt',
                        cat1='neg', cat2='pos',
                        train=True):
-    vocab_dict = create_dict(filepath=input_dir+'small.vocab')
+    vocab_dict = create_dict(filepath=input_dir+'imdb.vocab')
     len_dict = len(vocab_dict)
 
     vector_file = open(filename, 'w+')
@@ -98,8 +96,8 @@ def create_vector_file(input_dir='aclImdb/',
     vector_file.close()
 
 
-create_vector_file(input_dir='small/', filename='movie-review-small.NB', cat1='action', cat2='comedy')
-create_vector_file(input_dir='small/', filename='movie-review-small-test.NB', cat1='action', cat2='comedy', train=False)
+# create_vector_file(input_dir='small/', filename='movie-review-small.NB', cat1='action', cat2='comedy')
+# create_vector_file(input_dir='small/', filename='movie-review-small-test.NB', cat1='action', cat2='comedy', train=False)
 
-# create_vector_file(filename='vector-file-train.NB')
-# create_vector_file(filename='vector-file-test.NB', train=False)
+create_vector_file(filename='vector-file-train.NB')
+create_vector_file(filename='vector-file-test.NB', train=False)
