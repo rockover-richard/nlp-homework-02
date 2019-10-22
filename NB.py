@@ -41,6 +41,7 @@ def build_params(vocab_fp='aclImdb/imdb.vocab',
                  params_file='movie-review-BOW.NB'):
     vocab_dict = create_dict(vocab_fp)
     len_dict = len(vocab_dict)
+    print('len_dict', len_dict)
 
     neg_count = 0
     neg_params_v = np.zeros(len_dict+1)
@@ -58,6 +59,11 @@ def build_params(vocab_fp='aclImdb/imdb.vocab',
     pos_count = pos_params_v[0]
     total_neg = sum(neg_params_v[1:])
     total_pos = sum(pos_params_v[1:])
+
+    print('neg_count', neg_count)
+    print('pos_count', pos_count)
+    print('total_neg', total_neg)
+    print('total_pos', total_pos)
 
     # the second entry will the prior probabilities
     neg_params_v[0] = math.log((neg_count)/(neg_count+pos_count), 2)
@@ -93,7 +99,7 @@ def pred_NB(test_file='vector-file-test.NB',
     total_count = 0
     correct_count = 0
     with open(test_file, 'r') as tf:
-        for line in tf:
+        for i, line in enumerate(tf):
             neg_prob = neg_vector[1]
             pos_prob = pos_vector[1]
             vector = np.fromstring(line, sep=' ')
@@ -103,22 +109,30 @@ def pred_NB(test_file='vector-file-test.NB',
             for ind in nz_ind[0]:
                 if ind == 0:
                     continue
-                neg_prob += neg_vector[ind] * vector[ind]
-                pos_prob += pos_vector[ind] * vector[ind]
+                # print('ind', ind)
+                # print('neg_vector[ind]', neg_vector[ind])
+                # print('pos_vector[ind]', pos_vector[ind])
+                # print('vector[ind]', vector[ind])
+                neg_prob += neg_vector[ind+1] * vector[ind]
+                pos_prob += pos_vector[ind+1] * vector[ind]
 
+            # print('neg_prob', neg_prob)
+            # print('pos_prob', pos_prob)
+            # print('vector[0]', vector[0])
             if neg_prob > pos_prob:
-                prediction = '0'
-                is_correct = 1 if neg_vector[0] == 0 else 0
+                prediction = 0
+                actual = vector[0]
+                is_correct = 1 if prediction == actual else 0
                 correct_count += is_correct
 
-                cur_line = [prediction, str(neg_prob), str(is_correct)]
+                cur_line = [str(prediction), str(neg_prob), str(is_correct)]
                 pred_output.write(' '.join(cur_line) + '\n')
             else:
-                prediction = '1'
-                is_correct = 1 if pos_vector[0] == 1 else 0
+                prediction = 1
+                is_correct = 1 if prediction == actual else 0
                 correct_count += is_correct
 
-                cur_line = [prediction, str(pos_prob), str(is_correct)]
+                cur_line = [str(prediction), str(pos_prob), str(is_correct)]
                 pred_output.write(' '.join(cur_line) + '\n')
 
         accu_score = correct_count/total_count
@@ -136,5 +150,5 @@ def pred_NB(test_file='vector-file-test.NB',
 #         pred_file='small-BOW-pred.NB')
 
 # train_file, test_file = get_filepaths()
-build_params()
+# build_params()
 pred_NB()
