@@ -12,13 +12,16 @@ import numpy as np
 import os
 
 
-def create_dict(filepath='imdb.vocab'):
+def create_dict(filepath='aclImdb/imdb.vocab'):
     vocab_dict = {}
     with open(filepath) as vocab:
         for ind, word in enumerate(vocab, 1):
             vocab_dict[word.rstrip()] = ind
+            print(ind, word)
+    print('success!')
     return vocab_dict
 
+create_dict()
 
 def split_text(file):
     emoticons = {':)', ':-)', ';)', ';-)', ');', '=)', '8)', '):', ':o)',

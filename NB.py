@@ -36,21 +36,24 @@ def get_filepaths():
     return train_file, test_file
 
 
-def build_params(train_file, params_file='movie-review-BOW.NB'):
-    vocab_dict = create_dict()
+def build_params(vocab_fp='aclImdb/imdb.vocab',
+                 train_fp='vector-file-train.NB',
+                 params_file='movie-review-BOW.NB'):
+    vocab_dict = create_dict(vocab_fp)
     len_dict = len(vocab_dict)
 
     neg_count = 0
     neg_counts_v = np.zeros(len_dict+1)
     pos_counts_v = np.zeros(len_dict+1)
 
-    for line in train_file:
-        vector = np.fromstring(line, dtype=float, sep=' ')
-        if vector[0] == 0:
-            neg_count += 1
-            neg_counts_v += vector
-        else:
-            pos_counts_v += vector
+    with open(train_fp, 'r') as train_file:
+        for line in train_file:
+            vector = np.fromstring(line, dtype=float, sep=' ')
+            if vector[0] == 0:
+                neg_count += 1
+                neg_counts_v += vector
+            else:
+                pos_counts_v += vector
 
     pos_count = pos_counts_v[0]
     total_neg = sum(neg_counts_v[1:])
@@ -76,37 +79,65 @@ def build_params(train_file, params_file='movie-review-BOW.NB'):
 
 
 # incomplete
-def train_NB(train_file, test_file,
-             params_file='movie-review-BOW.NB',
-             pred_file='BOW-predictions.NB'):
+def pred_NB(test_file='vector-file-test.NB',
+            params_file='movie-review-BOW.NB',
+            pred_file='BOW-predictions.NB'):
 
     with open(params_file, 'r') as pf:
         params = pf.readlines()
         neg_vector = params[0]
+        print('negv', neg_vector)
         pos_vector = params[1]
+        print('posv', pos_vector)
 
     pred_output = open(pred_file, 'w+')
 
+    total_count = 0
+    correct_count = 0
     with open(test_file, 'r') as tf:
         for line in tf:
-            neg_prob = neg_vector[0]
-            pos_prob = pos_vector[0]
+            neg_prob = neg_vector[1]
+            pos_prob = pos_vector[1]
             vector = np.fromstring(line, sep=' ')
+            print(vector)
             nz_ind = np.nonzero(vector)
-            for ind in nz_ind[1:]:
+            print(nz_ind[0])
+            total_count += 1
+            for ind in nz_ind[0]:
+                print('ind', ind)
+                if ind == 0:
+                    continue
+                print('negv', neg_vector[ind], vector[ind])
+                print('posv', pos_vector[ind], vector[ind])
                 neg_prob *= neg_vector[ind] ** vector[ind]
                 pos_prob *= pos_vector[ind] ** vector[ind]
             if neg_prob > pos_prob:
-                pred_output.write('neg', neg_prob, 0 if neg_prob)
+                print('its neg', neg_prob)
+                prediction = '0'
+                is_correct = 1 if neg_vector[0] == 0 else 0
+                correct_count += is_correct
+
+                cur_line = [prediction, str(neg_prob), str(is_correct)]
+                pred_output.write(' '.join(cur_line))
             else:
-                pred_output.write('pos', )
+                print('its pos', pos_prob)
+                prediction = '1'
+                is_correct = 1 if pos_vector[0] == 1 else 0
+                correct_count += is_correct
+
+                cur_line = [prediction, str(pos_prob), str(is_correct)]
+                pred_output.write(' '.join(cur_line))
+
     pred_output.close()
 
-    pass
+# test
+build_params(vocab_fp='small/small.vocab',
+             train_fp='movie-review-small.NB',
+             params_file='small-BOW.NB')
 
-
-with open('movie-review-small.NB') as mrs:
-    build_params(mrs, params_file='small-BOW.NB')
+pred_NB(test_file='movie-review-small-test.NB',
+        params_file='small-BOW.NB',
+        pred_file='small-BOW-pred.NB')
 
 # train_file, test_file = get_filepaths()
 # train_NB = train_NB(train_file, test_file, params_file='small-BOW.NB', pred_file='small-predictions.NB')
