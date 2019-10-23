@@ -45,8 +45,12 @@ def build_params(vocab_fp='aclImdb/imdb.vocab',
 
     doc_count = 0
     neg_count = 0
+    pos_count = 0
     neg_params_v = np.zeros(len_dict+1)
     pos_params_v = np.zeros(len_dict+1)
+
+    if tf_idf:
+        idf_vector = np.zeros(len_dict+1)
 
     # if using TF-IDF-Weight (i.e. tf_idf == True)
     # TF(t) = (Number of times term t appears in a document) / (Total number of terms in the document).
@@ -55,17 +59,14 @@ def build_params(vocab_fp='aclImdb/imdb.vocab',
         for line in train_file:
             vector = np.fromstring(line, dtype=float, sep=' ')
 
-            # if tf_idf:
-            #     idf_vector = np.zeros(len(vector))
-
             # for TF-IDF-Weight
             # need total number of documents
             # and number of documents that contain word in vector
-            # if tf_idf:
-            #     doc_count += 1
-            #     nz_ind = np.nonzero(vector)
-            #     for ind in nz_ind[0]:
-            #         idf_vector[ind] += 1
+            if tf_idf:
+                doc_count += 1
+                nz_ind = np.nonzero(vector)
+                for ind in nz_ind[0]:
+                    idf_vector[ind] += 1
 
             if vector[0] == 0:
                 neg_count += 1
@@ -75,6 +76,7 @@ def build_params(vocab_fp='aclImdb/imdb.vocab',
                 #         vector[i] /= num_words
                 neg_params_v += vector
             else:
+                pos_count += 1
                 # if tf_idf:
                 #     num_words = sum(vector[1:])
                 #     for i in range(1, len_dict+1):
@@ -86,9 +88,11 @@ def build_params(vocab_fp='aclImdb/imdb.vocab',
     total_neg = sum(neg_params_v[1:])
     total_pos = sum(pos_params_v[1:])
 
-    for i in range(1, len(neg_params_v)):
-        neg_params_v[i] = math.log((neg_params_v[i]+1)/(total_neg+len_dict), 2)
-        pos_params_v[i] = math.log((pos_params_v[i]+1)/(total_pos+len_dict), 2)
+    # the last 
+    if not tf_idf:
+        for i in range(1, len(neg_params_v)):
+            neg_params_v[i] = math.log((neg_params_v[i]+1)/(total_neg+len_dict), 2)
+            pos_params_v[i] = math.log((pos_params_v[i]+1)/(total_pos+len_dict), 2)
 
     # the last entry will the prior probabilities
     neg_prior = math.log(neg_count/total_count, 2)
@@ -115,7 +119,6 @@ def build_params(vocab_fp='aclImdb/imdb.vocab',
     print('results:', neg_params_v, '\n', pos_params_v, '\n')
 
 
-# incomplete
 def pred_NB(test_file='vector-file-test.NB',
             params_file='movie-review-BOW.NB',
             pred_file='BOW-predictions.NB',
@@ -141,22 +144,15 @@ def pred_NB(test_file='vector-file-test.NB',
             # normalizing by term frequency
             if tf_idf:
                 num_words = sum(vector[1:])
-                for i in range(1, len_dict+1):
+                for i in range(1, len(vector)):
                     vector[i] /= num_words
 
             for ind in nz_ind[0]:
                 if ind == 0:
                     continue
-                # print('ind', ind)
-                # print('neg_vector[ind]', neg_vector[ind])
-                # print('pos_vector[ind]', pos_vector[ind])
-                # print('vector[ind]', vector[ind])
                 neg_prob += neg_vector[ind] * vector[ind]
                 pos_prob += pos_vector[ind] * vector[ind]
 
-            # print('neg_prob', neg_prob)
-            # print('pos_prob', pos_prob)
-            # print('vector[0]', vector[0])
             if neg_prob > pos_prob:
                 prediction = 0
                 actual = vector[0]
@@ -180,8 +176,6 @@ def pred_NB(test_file='vector-file-test.NB',
 
     pred_output.close()
 
-
-
 # test
 # build_params(vocab_fp='small/small.vocab',
 #              train_fp='movie-review-small.NB',
@@ -190,6 +184,7 @@ def pred_NB(test_file='vector-file-test.NB',
 # pred_NB(test_file='movie-review-small-test.NB',
 #         params_file='small-BOW.NB',
 #         pred_file='small-BOW-pred.NB')
+
 
 # train_file, test_file = get_filepaths()
 build_params()
