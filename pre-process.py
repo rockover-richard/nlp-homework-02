@@ -95,9 +95,18 @@ def create_vector_file(input_dir='aclImdb/',
 
     vector_file.close()
 
-
+# test of small data set from question 2a
 # create_vector_file(input_dir='small/', filename='movie-review-small.NB', cat1='action', cat2='comedy')
 # create_vector_file(input_dir='small/', filename='movie-review-small-test.NB', cat1='action', cat2='comedy', train=False)
 
-create_vector_file(filename='vector-file-train.NB')
-create_vector_file(filename='vector-file-test.NB', train=False)
+ans = input('Run pre-processing on training corpus? (Y/N): ')
+    if ans.lower() = 'y': 
+        create_vector_file(filename='vector-file-train.NB')
+    else:
+        'Skipping training corpus pre-processing...\n' 
+
+ans = input('Run pre-processing on test corpus? (Y/N): ')
+    if ans.lower() = 'y': 
+        create_vector_file(filename='vector-file-test.NB', train=False)
+    else:
+        'Skipping test corpus pre-processing...\n' 
