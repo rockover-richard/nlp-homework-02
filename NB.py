@@ -251,6 +251,12 @@ if ans.lower() == 'y':
     vocab_file = input('Input filepath for vocab: ')
     train_data = input('Input filepath for training data: ')
     output_file = input('Input filename for output file: ')
+    if not vocab_file:
+        vocab_file = 'aclImdb/imdb.vocab'
+    if not train_data:
+        train_data = 'vector-file-train.NB'
+    if not params_file:
+        output_file = 'movie-review-BOW.NB'
     build_params(vocab_fp=vocab_file, train_fp=train_data, params_file=output_file)
 else:
     print('Skipping parameters file build...\n') 
@@ -261,6 +267,12 @@ if ans.lower() == 'y':
     test_file = input('Input filepath for test data: ')
     params = input('Input filepath for parameters file: ')
     output_file = input('Input filename for output file: ')
+    if not vocab_file:
+        test_file = 'vector-file-test.NB'
+    if not params:
+        params = 'movie-review-BOW.NB'
+    if not output_file:
+        output_file = 'BOW-predictions.NB'
     pred_NB(test_file=test_file, params_file=params, pred_file=output_file)
 else:
     print('Skipping building BOW predictions...\n') 
@@ -272,6 +284,12 @@ if ans.lower() == 'y':
     vocab_file = input('Input filepath for vocab: ')
     train_data = input('Input filepath for training data: ')
     output_file = input('Input filename for output file: ')
+    if not vocab_file:
+        vocab_file = 'aclImdb/imdb.vocab'
+    if not train_data:
+        train_data = 'vector-file-train.NB'
+    if not params_file:
+        output_file = 'movie-review-BOW-tf-idf.NB'
     build_tf_idf(vocab_fp=vocab_file, train_fp=train_data, params_file=output_file)
 else:
     print('Skipping parameters file build...\n') 
@@ -282,8 +300,12 @@ if ans.lower() == 'y':
     test_file = input('Input filepath for test data: ')
     params = input('Input filepath for parameters file: ')
     output_file = input('Input filename for output file: ')
+    if not vocab_file:
+        test_file = 'vector-file-test.NB'
     if not params:
         params = 'movie-review-BOW-tf-idf.NB'
+    if not output_file:
+        output_file = 'BOW-tf-idf-predictions.NB'
     pred_NB(test_file=test_file, params_file=params, pred_file=output_file)
 else:
     print('Closing file...\n') 
