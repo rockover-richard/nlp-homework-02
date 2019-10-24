@@ -1,17 +1,15 @@
 '''
-pre-process.py should take the training (or test) directory
-containing movie reviews, should perform pre-processing on each file
-and output the files in the vector format to be used by NB.py
-
-Pre-processing: prior to building feature vectors, you should separate
-punctuation from words and lowercase the words in the reviews.
+Welcome to pre-process.py
 '''
 
 import re
 import numpy as np
 import os
 
-
+'''
+This functions creates a dictionary out of the vocab file to create a reference hash table
+to assign each word a unique index in the vector files. 
+'''
 def create_dict(filepath='aclImdb/imdb.vocab'):
     vocab_dict = {}
     with open(filepath) as vocab:
@@ -19,14 +17,21 @@ def create_dict(filepath='aclImdb/imdb.vocab'):
             vocab_dict[word.rstrip()] = ind
     return vocab_dict
 
-create_dict()
 
+'''
+This function performs preprocessing on a file and outputs a list.
+'''
 def split_text(file):
+    # I create a set of emoticons that are in the vocab file to reference.
     emoticons = {':)', ':-)', ';)', ';-)', ');', '=)', '8)', '):', ':o)',
                  ';o)', '=o)', ':(', '(8', ':-(', '(=', '8(', '=('}
+
+    # These are common leading or trailing characters
     sp_char = {':', ';', "'", '(', ')'}
 
     words = file.read()
+
+    # I first split at the following characters, but leaving ! and ? in.
     temp_list = re.split(r"\s|[,.<>*\"]|'s|([!?])", words.lower())
     word_list = []
 
@@ -50,10 +55,11 @@ def split_text(file):
 
     return word_list
 
-# with open('testing.txt') as test_file:
-#     print(split_text(test_file))
 
-
+'''
+This function takes the cat(egory) (i.e. pos or neg), file, dictionary, and the
+length of the dictionary to create a vector as a string.
+'''
 def update_vector(cat, file, vocab_dict, len_dict):
     v = np.zeros(len_dict+1, dtype=int)
     v[0] = cat
@@ -67,6 +73,21 @@ def update_vector(cat, file, vocab_dict, len_dict):
     return v.astype(str)
 
 
+'''
+This is the final function that creates a file with one vector per line
+corresponding to one document in the directory.
+
+The function takes the input dir(ectory), which should be organized in folders
+by category, the name of the output file, the name of the categories, and
+a boolean indicating whether or not it is the training data.
+
+The directory should be organized as follows:
+[input_dir]/[train or test]/[category]/
+
+In the output file,
+The first column is the category, neg or pos, encoded as a 0 or 1 respectively.
+The rest of the columns are a vector with the counts of the words within the document.
+'''
 def create_vector_file(input_dir='aclImdb/',
                        filename='vector-file.txt',
                        cat1='neg', cat2='pos',
@@ -85,7 +106,7 @@ def create_vector_file(input_dir='aclImdb/',
     with os.scandir(cat1_path) as cat1_dir:
         for file in cat1_dir:
             vector = update_vector(0, file, vocab_dict, len_dict)
-            vector_file.write(' '.join(vector) + '\n') # need to check if this shows in NB.py
+            vector_file.write(' '.join(vector) + '\n')
 
     cat2_path = input_dir + fp + cat2 + '/'
     with os.scandir(cat2_path) as cat2_dir:
@@ -95,18 +116,25 @@ def create_vector_file(input_dir='aclImdb/',
 
     vector_file.close()
 
-# test of small data set from question 2a
-# create_vector_file(input_dir='small/', filename='movie-review-small.NB', cat1='action', cat2='comedy')
-# create_vector_file(input_dir='small/', filename='movie-review-small-test.NB', cat1='action', cat2='comedy', train=False)
 
+# User can run the file in the console
+# May take ~30 minutes per pre-process step
 ans = input('Run pre-processing on training corpus? (Y/N): ')
     if ans.lower() = 'y': 
         create_vector_file(filename='vector-file-train.NB')
     else:
-        'Skipping training corpus pre-processing...\n' 
+        print('Skipping training corpus pre-processing...\n') 
 
 ans = input('Run pre-processing on test corpus? (Y/N): ')
     if ans.lower() = 'y': 
         create_vector_file(filename='vector-file-test.NB', train=False)
     else:
-        'Skipping test corpus pre-processing...\n' 
+        print('Skipping test corpus pre-processing...\n') 
+
+# for testing:
+# with open('testing.txt') as test_file:
+#     print(split_text(test_file))
+
+# test of small data set from question 2a
+# create_vector_file(input_dir='small/', filename='movie-review-small.NB', cat1='action', cat2='comedy')
+# create_vector_file(input_dir='small/', filename='movie-review-small-test.NB', cat1='action', cat2='comedy', train=False)
