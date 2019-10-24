@@ -120,16 +120,22 @@ def create_vector_file(input_dir='aclImdb/',
 # User can run the file in the console
 # May take ~30 minutes per pre-process step
 ans = input('Run pre-processing on training corpus? (Y/N): ')
-    if ans.lower() = 'y': 
-        create_vector_file(filename='vector-file-train.NB')
-    else:
-        print('Skipping training corpus pre-processing...\n') 
+if ans.lower() == 'y': 
+    output_file = input('Please name the output file. For default name, just press enter: ')
+    if not output_file:
+        output_file = 'vector-file-train.NB' 
+    create_vector_file(filename=output_file)
+else:
+    print('Skipping training corpus pre-processing...\n') 
 
 ans = input('Run pre-processing on test corpus? (Y/N): ')
-    if ans.lower() = 'y': 
-        create_vector_file(filename='vector-file-test.NB', train=False)
-    else:
-        print('Skipping test corpus pre-processing...\n') 
+if ans.lower() == 'y': 
+    output_file = input('Please name the output file. For default name, just press enter: ')
+    if not output_file:
+        output_file = 'vector-file-test.NB' 
+    create_vector_file(filename=output_file, train=False)
+else:
+    print('Skipping test corpus pre-processing...\n') 
 
 # for testing:
 # with open('testing.txt') as test_file:

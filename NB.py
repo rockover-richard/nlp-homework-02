@@ -246,45 +246,47 @@ def build_tf_idf(vocab_fp='aclImdb/imdb.vocab',
 # User can run the file in the console
 # May take a moment for each step
 ans = input('Build BOW parameters file from training data? (Y/N): ')
-    if ans.lower() = 'y': 
-        print('For default values, just press enter for the following: \n')
-        vocab_file = input('Input filepath for vocab: ')
-        train_data = input('Input filepath for training data: ')
-        output_file = input('Input filename for output file: ')
-        build_params(vocab_fp=vocab_file, train_fp=train_data, params_file=output_file)
-    else:
-        print('Skipping parameters file build...\n') 
+if ans.lower() == 'y': 
+    print('For default values, just press enter for the following: \n')
+    vocab_file = input('Input filepath for vocab: ')
+    train_data = input('Input filepath for training data: ')
+    output_file = input('Input filename for output file: ')
+    build_params(vocab_fp=vocab_file, train_fp=train_data, params_file=output_file)
+else:
+    print('Skipping parameters file build...\n') 
+
 ans = input('Build BOW prediction file from test data? (Y/N): ')
-    if ans.lower() = 'y': 
-        print('For default values, just press enter for the following: \n')
-        test_file = input('Input filepath for test data: ')
-        params = input('Input filepath for parameters file: ')
-        output_file = input('Input filename for output file: ')
-        pred_NB(test_file=test_file, params_file=params, pred_file=output_file)
-    else:
-        print('Skipping building BOW predictions...\n') 
+if ans.lower() == 'y': 
+    print('For default values, just press enter for the following: \n')
+    test_file = input('Input filepath for test data: ')
+    params = input('Input filepath for parameters file: ')
+    output_file = input('Input filename for output file: ')
+    pred_NB(test_file=test_file, params_file=params, pred_file=output_file)
+else:
+    print('Skipping building BOW predictions...\n') 
 
 # For optional tf_idf feature:
 ans = input('Build tf-idf parameters file from training data? (Y/N): ')
-    if ans.lower() = 'y': 
-        print('For default values, just press enter for the following: \n')
-        vocab_file = input('Input filepath for vocab: ')
-        train_data = input('Input filepath for training data: ')
-        output_file = input('Input filename for output file: ')
-        build_tf_idf(vocab_fp=vocab_file, train_fp=train_data, params_file=output_file)
-    else:
-        print('Skipping parameters file build...\n') 
+if ans.lower() == 'y': 
+    print('For default values, just press enter for the following: \n')
+    vocab_file = input('Input filepath for vocab: ')
+    train_data = input('Input filepath for training data: ')
+    output_file = input('Input filename for output file: ')
+    build_tf_idf(vocab_fp=vocab_file, train_fp=train_data, params_file=output_file)
+else:
+    print('Skipping parameters file build...\n') 
+
 ans = input('Build tf-idf prediction file from test data? (Y/N): ')
-    if ans.lower() = 'y': 
-        print('For default values, just press enter for the following: \n')
-        test_file = input('Input filepath for test data: ')
-        params = input('Input filepath for parameters file: ')
-        output_file = input('Input filename for output file: ')
-        if not params:
-            params = 'movie-review-BOW-tf-idf.NB'
-        pred_NB(test_file=test_file, params_file=params, pred_file=output_file)
-    else:
-        print('Closing file...\n') 
+if ans.lower() == 'y': 
+    print('For default values, just press enter for the following: \n')
+    test_file = input('Input filepath for test data: ')
+    params = input('Input filepath for parameters file: ')
+    output_file = input('Input filename for output file: ')
+    if not params:
+        params = 'movie-review-BOW-tf-idf.NB'
+    pred_NB(test_file=test_file, params_file=params, pred_file=output_file)
+else:
+    print('Closing file...\n') 
 
 # test
 # build_params(vocab_fp='small/small.vocab',
